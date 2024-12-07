@@ -47,6 +47,9 @@ export const useComplimentSystem = () => {
         navigateNext();
       } else if (e.code === "KeyH") {
         setShowPanel((prev) => !prev);
+      } else if (e.code === "KeyF") {
+        //    favorite the current compliment
+        toggleFavorite(compliments[currentIndex]);
       }
     };
 

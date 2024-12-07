@@ -1,24 +1,31 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Heart, History, Clock } from "lucide-react";
 import { ComplimentType } from "../lib/content/compliments";
+import { useState } from "react";
 
 interface HistoryPanelProps {
   show: boolean;
   onClose: () => void;
   compliments: ComplimentType[];
-  favorites: ComplimentType[];
   onToggleFavorite: (compliment: ComplimentType) => void;
   isFavorite: (id: string) => boolean;
+  currentCompliment: ComplimentType | null;
 }
 
 const HistoryPanel = ({
   show,
   onClose,
   compliments,
-  favorites,
+  currentCompliment,
   onToggleFavorite,
   isFavorite,
 }: HistoryPanelProps) => {
+  const [showFavorites, setShowFavorites] = useState(false);
+
+  const displayedCompliments = showFavorites
+    ? compliments.filter((c) => isFavorite(c.id))
+    : compliments;
+
   return (
     <AnimatePresence>
       {show && (
@@ -44,15 +51,27 @@ const HistoryPanel = ({
 
             <div className="flex gap-4 mb-6">
               <button
-                className="flex-1 p-3 rounded-xl bg-white/5 dark:bg-white/5 
-                               border border-white/10 flex items-center justify-center gap-2"
+                onClick={() => setShowFavorites(false)}
+                className={`flex-1 p-3 rounded-xl flex items-center justify-center gap-2
+                          ${
+                            !showFavorites
+                              ? "bg-white/20 dark:bg-white/10 border-white/20"
+                              : "bg-white/5 dark:bg-white/5 border-white/10"
+                          } 
+                          border transition-colors`}
               >
                 <History className="w-4 h-4" />
                 <span>History</span>
               </button>
               <button
-                className="flex-1 p-3 rounded-xl bg-white/5 dark:bg-white/5 
-                               border border-white/10 flex items-center justify-center gap-2"
+                onClick={() => setShowFavorites(true)}
+                className={`flex-1 p-3 rounded-xl flex items-center justify-center gap-2
+                          ${
+                            showFavorites
+                              ? "bg-white/20 dark:bg-white/10 border-white/20"
+                              : "bg-white/5 dark:bg-white/5 border-white/10"
+                          } 
+                          border transition-colors`}
               >
                 <Heart className="w-4 h-4" />
                 <span>Favorites</span>
@@ -60,13 +79,18 @@ const HistoryPanel = ({
             </div>
 
             <div className="flex-1 overflow-y-auto space-y-4">
-              {compliments.map((compliment) => (
+              {displayedCompliments.map((compliment) => (
                 <motion.div
                   key={compliment.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="p-4 rounded-xl bg-white/5 dark:bg-black/20 
-                           border border-white/10 relative group"
+                  className={`p-4 rounded-xl bg-white/5 dark:bg-black/20 
+                           border border-white/10 relative group
+                           ${
+                             currentCompliment?.id === compliment.id
+                               ? "ring-2 ring-purple-500/50"
+                               : ""
+                           }`}
                 >
                   <p className="text-sm">{compliment.text}</p>
                   <div
@@ -92,6 +116,14 @@ const HistoryPanel = ({
                   </div>
                 </motion.div>
               ))}
+
+              {displayedCompliments.length === 0 && (
+                <div className="text-center text-black/40 dark:text-white/40 py-8">
+                  {showFavorites
+                    ? "No favorite compliments yet"
+                    : "No compliments in history"}
+                </div>
+              )}
             </div>
 
             <div className="mt-4 text-sm text-center text-black/40 dark:text-white/40">

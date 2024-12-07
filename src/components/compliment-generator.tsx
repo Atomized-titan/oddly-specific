@@ -4,6 +4,7 @@ import { useAnimation } from "../contexts/AnimationContext";
 import { useComplimentSystem } from "../hooks/useComplimentSystem";
 import { useState } from "react";
 import HistoryPanel from "./history-panel";
+import Tooltip from "./tooltip";
 
 const ComplimentGenerator = () => {
   const { isHeaderAnimationComplete } = useAnimation();
@@ -59,75 +60,87 @@ const ComplimentGenerator = () => {
           </AnimatePresence>
 
           <div className="absolute bottom-8 right-8 flex items-center gap-4">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={navigatePrevious}
-              disabled={currentIndex <= 0}
-              className="p-2 rounded-full backdrop-blur-md bg-white/10 dark:bg-white/5 
+            <Tooltip content="Previous compliment (arrow left)">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={navigatePrevious}
+                disabled={currentIndex <= 0}
+                className="p-2 rounded-full backdrop-blur-md bg-white/10 dark:bg-white/5 
                        disabled:opacity-30 border border-white/10"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </motion.button>
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </motion.button>
+            </Tooltip>
 
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={generateNew}
-              className="px-6 py-2 rounded-full backdrop-blur-md bg-white/10 
+            <Tooltip content="Generate new compliment (space)">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={generateNew}
+                className="px-6 py-2 rounded-full backdrop-blur-md bg-white/10 
                        dark:bg-white/5 font-medium border border-white/10"
-            >
-              Generate
-            </motion.button>
+              >
+                Generate
+              </motion.button>
+            </Tooltip>
 
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={navigateNext}
-              disabled={currentIndex >= compliments.length - 1}
-              className="p-2 rounded-full backdrop-blur-md bg-white/10 dark:bg-white/5 
+            <Tooltip content="Next compliment (arrow right)">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={navigateNext}
+                disabled={currentIndex >= compliments.length - 1}
+                className="p-2 rounded-full backdrop-blur-md bg-white/10 dark:bg-white/5 
                        disabled:opacity-30 border border-white/10"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </motion.button>
+              >
+                <ChevronRight className="w-5 h-5" />
+              </motion.button>
+            </Tooltip>
           </div>
 
           {currentCompliment && (
             <div className="absolute top-8 right-8 flex gap-2">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setShowPanel(true)}
-                className="p-2 rounded-full backdrop-blur-md bg-white/10 dark:bg-white/5 border border-white/10"
-              >
-                <History className="w-4 h-4" />
-              </motion.button>
+              <Tooltip content="View history (H)">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowPanel(true)}
+                  className="p-2 rounded-full backdrop-blur-md bg-white/10 dark:bg-white/5 border border-white/10"
+                >
+                  <History className="w-4 h-4" />
+                </motion.button>
+              </Tooltip>
 
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => toggleFavorite(currentCompliment)}
-                className="p-2 rounded-full backdrop-blur-md bg-white/10 dark:bg-white/5 border border-white/10"
-              >
-                <Heart
-                  className={`w-4 h-4 ${
-                    isFavorite(currentCompliment.id) ? "fill-current" : ""
-                  }`}
-                />
-              </motion.button>
+              <Tooltip content="Toggle favorite (F)">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => toggleFavorite(currentCompliment)}
+                  className="p-2 rounded-full backdrop-blur-md bg-white/10 dark:bg-white/5 border border-white/10"
+                >
+                  <Heart
+                    className={`w-4 h-4 ${
+                      isFavorite(currentCompliment.id) ? "fill-current" : ""
+                    }`}
+                  />
+                </motion.button>
+              </Tooltip>
 
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => {
-                  navigator.clipboard.writeText(currentCompliment.text);
-                  setShowCopied(true);
-                  setTimeout(() => setShowCopied(false), 2000);
-                }}
-                className="p-2 rounded-full backdrop-blur-md bg-white/10 dark:bg-white/5 border border-white/10"
-              >
-                <Copy className="w-4 h-4" />
-              </motion.button>
+              <Tooltip content="Copy compliment">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => {
+                    navigator.clipboard.writeText(currentCompliment.text);
+                    setShowCopied(true);
+                    setTimeout(() => setShowCopied(false), 2000);
+                  }}
+                  className="p-2 rounded-full backdrop-blur-md bg-white/10 dark:bg-white/5 border border-white/10"
+                >
+                  <Copy className="w-4 h-4" />
+                </motion.button>
+              </Tooltip>
             </div>
           )}
 
@@ -137,7 +150,7 @@ const ComplimentGenerator = () => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="absolute top-8 right-24 px-3 py-1 rounded-full text-sm 
+                className="absolute top-8 -right-12 px-3 py-1 rounded-full text-sm 
                          bg-black/80 text-white dark:bg-white/80 dark:text-black"
               >
                 Copied!
