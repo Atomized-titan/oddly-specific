@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Oddly Specific
+
+Generate delightfully specific compliments that hit differently than your average praise. Because generic compliments are boring.
+
+![Oddly Specific Demo](public/og.png)
+
+## Features
+
+- 🎯 Oddly specific, randomly generated compliments
+- 🎨 Beautiful glassmorphic UI with dark/light mode
+- ⌨️ Keyboard shortcuts for quick navigation
+- 💾 Save compliments as high-quality images
+- ❤️ Favorite and track your best compliments
+- 📱 Fully responsive design
+- 🚀 Lightning fast, built with Next.js 14
+
+## Tech Stack
+
+- Next.js 14 (App Router)
+- Framer Motion
+- Tailwind CSS
+- Geist Font
+- TypeScript
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+# Clone the repository
+git clone https://github.com/Atomized-titan/oddly-specific.git
+
+# Install dependencies
+cd oddly-specific
+npm install
+
+# Run the development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Keyboard Shortcuts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `Space` - Generate new compliment
+- `←` `→` - Navigate through history
+- `H` - Toggle history panel
+- `?` - Show keyboard shortcuts
 
-## Learn More
+## Contributing
 
-To learn more about Next.js, take a look at the following resources:
+Contributions are welcome! Feel free to:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Add new compliments
+- Improve animations
+- Suggest new features
+- Report bugs
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## License
 
-## Deploy on Vercel
+MIT License - feel free to use this project however you'd like.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Credits
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Created by [Pushpal Ghoshal]("https://www.linkedin.com/in/pushpal-ghoshal-093347156/")

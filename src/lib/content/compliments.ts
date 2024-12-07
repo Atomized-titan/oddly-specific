@@ -80,6 +80,10 @@ const complimentsByCategory = {
     "keeps backup charging cables in every room 'just in case'",
     "maintains different walking speeds for different types of streets",
     "categorizes groceries by shop layout rather than food groups",
+    "sets multiple alarms with increasingly dramatic names",
+    "has a special voice just for talking to plants",
+    "alphabetizes the spice rack but has a chaos drawer in every room",
+    "saves Instagram posts in extremely specific folder categories",
   ],
   creativity: [
     "creates spotify playlists for extremely specific moods",
@@ -87,6 +91,11 @@ const complimentsByCategory = {
     "turns leftovers into 'brand new recipes' by changing the plating",
     "writes shopping lists in color-coded haiku format",
     "designs elaborate coffee station layouts but always makes instant coffee",
+    "creates backstories for random objects in your house",
+    "maintains a collection of 'emergency craft supplies' that keeps growing",
+    "takes aesthetic photos of mundane things like parking meters",
+    "has different fonts for different types of notes",
+    "writes movie reviews in the style of Victorian literature",
   ],
   organization: [
     "organizes books by color but remembers their location by author",
@@ -94,6 +103,11 @@ const complimentsByCategory = {
     "labels everything in the fridge except the most obvious items",
     "sorts clothes by 'vibe' instead of season",
     "maintains multiple to-do lists for different energy levels",
+    "has a perfectly organized desktop but 47 tabs open",
+    "creates spreadsheets for the most random things",
+    "arranges apps by color but can never find them",
+    "keeps a 'misc drawer' that's actually secretly organized",
+    "has different notebooks for different types of ideas",
   ],
   kindness: [
     "secretly waters the office plants when no one's watching",
@@ -101,6 +115,11 @@ const complimentsByCategory = {
     "leaves positive reviews for small businesses after good experiences",
     "remembers everyone's coffee order and dietary restrictions",
     "picks up litter while pretending to tie their shoelaces",
+    "saves interesting articles to share with specific friends",
+    "notices when someone changes their hair slightly",
+    "keeps emergency snacks for friends' specific preferences",
+    "remembers random details from conversations months ago",
+    "secretly pays for strangers' coffee but never tells anyone",
   ],
   fun: [
     "turns every minor inconvenience into a dramatic story",
@@ -108,6 +127,11 @@ const complimentsByCategory = {
     "creates elaborate backstories for neighborhood cats",
     "has different dance moves for different household chores",
     "invents new words for specific situations and actually gets them to catch on",
+    "makes sound effects for everyday activities",
+    "narrates their pet's thoughts in a specific voice",
+    "has a collection of random facts for every occasion",
+    "creates theme songs for regular activities",
+    "gives weird nicknames to everyday objects",
   ],
 };
 
@@ -115,8 +139,8 @@ const ensureCorrectGrammar = (prefix: string, compliment: string): string => {
   // Remove any trailing periods from the compliment
   compliment = compliment.replace(/\.$/, "");
 
-  // Add proper spacing
-  return `${prefix} ${compliment}`;
+  // Add proper spacing and period
+  return `${prefix} ${compliment}.`;
 };
 
 export const generateCompliment = (): ComplimentType => {
