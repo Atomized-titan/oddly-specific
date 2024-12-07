@@ -2,16 +2,24 @@ import { motion } from "framer-motion";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import React, { useState } from "react";
+import { useAnimation } from "../contexts/AnimationContext";
 
 const AnimatedHeader = () => {
   const [isCentered, setIsCentered] = useState(true);
+  const { setHeaderAnimationComplete } = useAnimation();
 
   const { theme, setTheme } = useTheme();
 
   React.useEffect(() => {
-    const timer = setTimeout(() => setIsCentered(false), 800); // Increased delay
+    const timer = setTimeout(() => {
+      setIsCentered(false);
+      // Add a small delay to ensure the header animation is complete
+      setTimeout(() => {
+        setHeaderAnimationComplete(true);
+      }, 1000); // Adjust this timing based on your header animation duration
+    }, 800);
     return () => clearTimeout(timer);
-  }, []);
+  }, [setHeaderAnimationComplete]);
 
   return (
     <motion.div

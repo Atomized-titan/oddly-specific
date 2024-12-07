@@ -49,6 +49,7 @@ declare module "framer-motion" {
     onClick?: () => void;
     children?: React.ReactNode;
     initial?: string | Record<string, MotionValue>;
+    disabled?: boolean;
     animate?: string | Record<string, MotionValue>;
     exit?: string | Record<string, MotionValue>;
     transition?: TransitionProps;
