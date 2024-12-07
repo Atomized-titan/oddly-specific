@@ -1,8 +1,16 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronLeft, ChevronRight, Copy, Heart, History } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Copy,
+  Download,
+  Heart,
+  History,
+} from "lucide-react";
+import { useState } from "react";
 import { useAnimation } from "../contexts/AnimationContext";
 import { useComplimentSystem } from "../hooks/useComplimentSystem";
-import { useState } from "react";
+import { generateComplimentImage } from "../utils/generateImage";
 import HistoryPanel from "./history-panel";
 import Tooltip from "./tooltip";
 
@@ -21,6 +29,7 @@ const ComplimentGenerator = () => {
     currentCompliment,
   } = useComplimentSystem();
   const [showCopied, setShowCopied] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   if (!isHeaderAnimationComplete) return null;
 
@@ -117,6 +126,56 @@ const ComplimentGenerator = () => {
 
           {currentCompliment && (
             <div className="absolute top-8 right-8 flex gap-2">
+              {/* Save as image */}
+              <Tooltip content="Save as image">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  disabled={isGenerating}
+                  onClick={async () => {
+                    if (!currentCompliment || isGenerating) return;
+
+                    try {
+                      setIsGenerating(true);
+                      const imageUrl = await generateComplimentImage(
+                        currentCompliment.text,
+                        currentCompliment.category
+                      );
+
+                      const link = document.createElement("a");
+                      link.href = imageUrl;
+                      link.download = `oddly-specific-${Date.now()}.png`;
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                    } catch (error) {
+                      console.error("Failed to generate image:", error);
+                    } finally {
+                      setIsGenerating(false);
+                    }
+                  }}
+                  className="p-2 rounded-full backdrop-blur-md bg-white/10 dark:bg-white/5 
+              border border-white/10 hover:bg-white/20 dark:hover:bg-white/10
+              disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isGenerating ? (
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{
+                        repeat: Infinity,
+                        duration: 1,
+                        ease: "linear",
+                      }}
+                    >
+                      <Download className="w-4 h-4" />
+                    </motion.div>
+                  ) : (
+                    <Download className="w-4 h-4" />
+                  )}
+                </motion.button>
+              </Tooltip>
+
+              {/* View history */}
               <Tooltip content="View history (H)">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
@@ -128,6 +187,7 @@ const ComplimentGenerator = () => {
                 </motion.button>
               </Tooltip>
 
+              {/* Toggle favorite */}
               <Tooltip content="Toggle favorite (F)">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
@@ -143,6 +203,7 @@ const ComplimentGenerator = () => {
                 </motion.button>
               </Tooltip>
 
+              {/* Copy compliment */}
               <Tooltip content="Copy compliment">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
@@ -160,6 +221,7 @@ const ComplimentGenerator = () => {
             </div>
           )}
 
+          {/* Compliment copied message */}
           <AnimatePresence>
             {showCopied && (
               <motion.div
