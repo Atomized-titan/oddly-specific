@@ -37,7 +37,7 @@ const AnimatedHeader = () => {
         <div className="flex justify-between items-center">
           <motion.h1
             layout
-            className={`font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600 whitespace-nowrap ${
+            className={`font-bold bg-clip-text from-white to-white text-transparent bg-gradient-to-r dark:from-purple-400 dark:to-pink-600 whitespace-nowrap ${
               isCentered ? "text-7xl" : "text-2xl"
             }`}
             initial={{ opacity: 0, y: 20 }}
@@ -49,7 +49,7 @@ const AnimatedHeader = () => {
               opacity: { duration: 0.2 },
             }}
           >
-            Oddly Specific
+            Oddly Specific Compliments
           </motion.h1>
 
           <motion.button

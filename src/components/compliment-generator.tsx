@@ -32,6 +32,16 @@ const ComplimentGenerator = () => {
         transition={{ delay: 0.3 }}
         className="w-full max-w-4xl mx-auto px-6"
       >
+        <motion.p
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="text-center mb-6 text-gray-600/90 dark:text-white/60
+               font-medium text-lg"
+        >
+          Because generic compliments are boring
+        </motion.p>
+
         <motion.div
           className="relative backdrop-blur-md bg-white/10 dark:bg-black/10 
                      rounded-[2rem] p-12 shadow-[0_8px_16px_rgba(0,0,0,0.05)] 
@@ -39,7 +49,7 @@ const ComplimentGenerator = () => {
                      border border-white/20 dark:border-white/10"
         >
           <div className="absolute top-8 left-8 flex gap-2">
-            <motion.div className="text-sm font-medium text-black/40 dark:text-white/40">
+            <motion.div className="text-sm font-medium text-white dark:text-white/40">
               {currentCompliment?.category.toUpperCase()}
             </motion.div>
           </div>
@@ -50,11 +60,17 @@ const ComplimentGenerator = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="min-h-[200px] py-10 flex items-center justify-center text-center px-8"
+              className="min-h-[200px] py-12 flex items-center justify-center text-center px-8"
             >
-              <p className="text-5xl font-medium leading-tight">
-                {currentCompliment?.text ||
-                  "Click generate for an oddly specific compliment"}
+              <p className="text-2xl md:text-5xl font-medium leading-tight">
+                {currentCompliment?.text || (
+                  <span>
+                    Press <span className="text-violet-400">space</span> to
+                    generate a new compliment or{" "}
+                    <span className="text-violet-400">arrow keys</span> to
+                    navigate
+                  </span>
+                )}
               </p>
             </motion.div>
           </AnimatePresence>
