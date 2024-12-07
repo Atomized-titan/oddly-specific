@@ -45,7 +45,7 @@ const ComplimentGenerator = () => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="text-center mb-6 text-gray-600/90 dark:text-white/60
+          className="text-center mb-6 text-gray-300/90 dark:text-white/60
                font-medium text-lg"
         >
           Because generic compliments are boring

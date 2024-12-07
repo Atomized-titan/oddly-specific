@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     title: "Oddly Specific",
     description:
       "Generate delightfully specific compliments that hit differently than your average praise.",
-    url: "https://oddlyspecific.vercel.app",
+    url: "https://oddly-specific.vercel.app",
     siteName: "Oddly Specific",
     locale: "en_US",
     type: "website",
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     title: "Oddly Specific",
     description:
       "Generate delightfully specific compliments that hit differently than your average praise.",
-    creator: "@yourusername",
+    creator: "@pushpalghoshal",
     images: ["/og.png"],
   },
   icons: {

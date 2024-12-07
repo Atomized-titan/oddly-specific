@@ -33,12 +33,12 @@ const Footer = () => {
       <div className="h-4 w-px bg-black/[0.06] dark:bg-white/10" />
 
       <p className="text-sm text-gray-600/90 dark:text-white/40 text-center">
-        <span className="">Created by </span>
+        <span className="text-gray-300/90">Created by </span>
         <a
           href={LINKEDIN_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-gray-800 dark:text-white hover:text-purple-600 
+          className="text-white dark:text-white hover:text-purple-600 
                    dark:hover:text-purple-400 transition-colors duration-200
                    inline-flex items-center gap-1"
         >
