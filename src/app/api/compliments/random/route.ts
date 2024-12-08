@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // app/api/compliments/random/route.ts
 import { db } from "@/db";
 
@@ -19,7 +20,8 @@ export async function GET() {
     }
 
     return NextResponse.json(result[0]);
-  } catch (error) {
+  } catch (error: any) {
+    console.error("Failed to fetch random compliment:", error);
     return NextResponse.json(
       { error: "Failed to fetch random compliment" },
       { status: 500 }

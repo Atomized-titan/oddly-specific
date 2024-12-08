@@ -1,7 +1,7 @@
 // app/api/compliments/[id]/vote/route.ts
 import { db } from "@/db";
 import { votes, rateLimits } from "@/db/schema";
-import { and, eq, lt } from "drizzle-orm";
+import { and, eq, lt, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { v4 as uuid } from "uuid";
@@ -50,7 +50,7 @@ export async function POST(
 ) {
   try {
     // Get or create session ID
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     let sessionId = cookieStore.get("session-id")?.value;
 
     if (!sessionId) {
