@@ -1,29 +1,53 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Heart, History, Clock } from "lucide-react";
 import { ComplimentType } from "../lib/content/compliments";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useVoting } from "@/hooks/useVoting";
 
 interface HistoryPanelProps {
   show: boolean;
   onClose: () => void;
   compliments: ComplimentType[];
-  onToggleFavorite: (compliment: ComplimentType) => void;
-  isFavorite: (id: string) => boolean;
   currentCompliment: ComplimentType | null;
 }
 
-const HistoryPanel = ({
-  show,
-  onClose,
-  compliments,
-  currentCompliment,
-  onToggleFavorite,
-  isFavorite,
-}: HistoryPanelProps) => {
+const HistoryPanel = ({ show, onClose, compliments }: HistoryPanelProps) => {
   const [showFavorites, setShowFavorites] = useState(false);
+  const [votedCompliments, setVotedCompliments] = useState<Set<string>>(
+    new Set()
+  );
+
+  useEffect(() => {
+    // Load voted compliments on mount
+    const loadVotedCompliments = async () => {
+      const votes = await Promise.all(
+        compliments.map(async (compliment) => {
+          try {
+            const response = await fetch(
+              `/api/compliments/${compliment.id}/vote`
+            );
+            const data = await response.json();
+            return { id: compliment.id, hasVoted: data.hasVoted };
+          } catch (error: any) {
+            console.error("Failed to check vote status:", error);
+            return { id: compliment.id, hasVoted: false };
+          }
+        })
+      );
+
+      setVotedCompliments(
+        new Set(votes.filter((v) => v.hasVoted).map((v) => v.id))
+      );
+    };
+
+    if (show) {
+      loadVotedCompliments();
+    }
+  }, [show, compliments]);
 
   const displayedCompliments = showFavorites
-    ? compliments.filter((c) => isFavorite(c.id))
+    ? compliments.filter((c) => votedCompliments.has(c.id))
     : compliments;
 
   return (
@@ -80,47 +104,13 @@ const HistoryPanel = ({
 
             <div className="flex-1 overflow-y-auto space-y-4">
               {displayedCompliments.map((compliment) => (
-                <motion.div
-                  key={compliment.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className={`p-4 rounded-xl bg-white/5 dark:bg-black/20 
-                           border border-white/10 relative group
-                           ${
-                             currentCompliment?.id === compliment.id
-                               ? "ring-2 ring-purple-500/50"
-                               : ""
-                           }`}
-                >
-                  <p className="text-sm">{compliment.text}</p>
-                  <div
-                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 
-                                transition-opacity flex gap-2"
-                  >
-                    <button
-                      onClick={() => onToggleFavorite(compliment)}
-                      className="p-1.5 rounded-full bg-white/10 dark:bg-black/20"
-                    >
-                      <Heart
-                        className={`w-3 h-3 ${
-                          isFavorite(compliment.id) ? "fill-current" : ""
-                        }`}
-                      />
-                    </button>
-                  </div>
-                  <div className="mt-2 flex items-center gap-1 text-xs text-black/40 dark:text-white/40">
-                    <Clock className="w-3 h-3" />
-                    <span>
-                      {new Date(compliment.timestamp).toLocaleDateString()}
-                    </span>
-                  </div>
-                </motion.div>
+                <VotedCompliment key={compliment.id} compliment={compliment} />
               ))}
 
               {displayedCompliments.length === 0 && (
                 <div className="text-center text-black/40 dark:text-white/40 py-8">
                   {showFavorites
-                    ? "No favorite compliments yet"
+                    ? "No voted compliments yet"
                     : "No compliments in history"}
                 </div>
               )}
@@ -137,3 +127,44 @@ const HistoryPanel = ({
 };
 
 export default HistoryPanel;
+
+const VotedCompliment = ({ compliment }: { compliment: ComplimentType }) => {
+  const {
+    isLoading: isVoting,
+    hasVoted,
+    voteCount,
+    toggleVote,
+  } = useVoting(compliment.id);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className={`p-4 rounded-xl bg-white/5 dark:bg-black/20 
+                 border border-white/10 relative group`}
+    >
+      <p className="text-sm">{compliment.text}</p>
+      <div
+        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 
+                    transition-opacity flex gap-2"
+      >
+        <button
+          onClick={toggleVote}
+          disabled={isVoting}
+          className="p-1.5 rounded-full bg-white/10 dark:bg-black/20"
+        >
+          <Heart
+            className={`w-3 h-3 ${
+              hasVoted ? "fill-current text-violet-500" : ""
+            }`}
+          />
+          {voteCount > 0 && <span className="ml-1 text-xs">{voteCount}</span>}
+        </button>
+      </div>
+      <div className="mt-2 flex items-center gap-1 text-xs text-black/40 dark:text-white/40">
+        <Clock className="w-3 h-3" />
+        <span>{new Date(compliment.timestamp).toLocaleDateString()}</span>
+      </div>
+    </motion.div>
+  );
+};

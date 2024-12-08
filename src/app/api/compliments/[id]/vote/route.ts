@@ -44,13 +44,43 @@ async function checkRateLimit(sessionId: string) {
   };
 }
 
+// Check if user has voted
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const sessionId = (await cookies()).get("session-id")?.value;
+    if (!sessionId) return NextResponse.json({ hasVoted: false });
+
+    const id = (await params).id;
+
+    const vote = await db
+      .select()
+      .from(votes)
+      .where(and(eq(votes.complimentId, id), eq(votes.sessionId, sessionId)))
+      .get();
+
+    return NextResponse.json({
+      hasVoted: !!vote,
+      voteCount: await getVoteCount(id),
+    });
+  } catch (error) {
+    console.error("Failed to check vote status:", error);
+    return NextResponse.json(
+      { error: "Failed to check vote status" },
+      { status: 500 }
+    );
+  }
+}
+
+// Vote for a compliment
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const id = (await params).id;
   try {
-    // Get or create session ID
     const cookieStore = await cookies();
     let sessionId = cookieStore.get("session-id")?.value;
 
@@ -60,7 +90,7 @@ export async function POST(
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
-        maxAge: 60 * 60 * 24 * 30, // 30 days
+        maxAge: 60 * 60 * 24 * 30,
       });
     }
 
@@ -68,10 +98,7 @@ export async function POST(
     const rateLimit = await checkRateLimit(sessionId);
     if (!rateLimit.success) {
       return NextResponse.json(
-        {
-          error: "Too many requests",
-          ...rateLimit,
-        },
+        { error: "Too many requests", ...rateLimit },
         {
           status: 429,
           headers: {
@@ -95,19 +122,74 @@ export async function POST(
     }
 
     // Create vote
-    const [vote] = await db
-      .insert(votes)
-      .values({
-        id: uuid(),
-        complimentId: id,
-        sessionId,
-        createdAt: new Date(),
-      })
-      .returning();
+    await db.insert(votes).values({
+      id: uuid(),
+      complimentId: id,
+      sessionId,
+      createdAt: new Date(),
+    });
 
-    return NextResponse.json({ vote });
+    return NextResponse.json({
+      success: true,
+      voteCount: await getVoteCount(id),
+    });
   } catch (error) {
     console.error("Failed to vote:", error);
     return NextResponse.json({ error: "Failed to vote" }, { status: 500 });
   }
+}
+
+// Remove vote
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const id = (await params).id;
+  try {
+    const sessionId = (await cookies()).get("session-id")?.value;
+    if (!sessionId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const rateLimit = await checkRateLimit(sessionId);
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        { error: "Too many requests", ...rateLimit },
+        {
+          status: 429,
+          headers: {
+            "X-RateLimit-Limit": String(RATE_LIMIT),
+            "X-RateLimit-Remaining": String(rateLimit.remaining),
+            "X-RateLimit-Reset": String(Date.now() + RATE_LIMIT_WINDOW),
+          },
+        }
+      );
+    }
+
+    await db
+      .delete(votes)
+      .where(and(eq(votes.complimentId, id), eq(votes.sessionId, sessionId)));
+
+    return NextResponse.json({
+      success: true,
+      voteCount: await getVoteCount(id),
+    });
+  } catch (error) {
+    console.error("Failed to remove vote:", error);
+    return NextResponse.json(
+      { error: "Failed to remove vote" },
+      { status: 500 }
+    );
+  }
+}
+
+// Helper function to get vote count
+async function getVoteCount(complimentId: string): Promise<number> {
+  const result = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(votes)
+    .where(eq(votes.complimentId, complimentId))
+    .get();
+
+  return result?.count || 0;
 }

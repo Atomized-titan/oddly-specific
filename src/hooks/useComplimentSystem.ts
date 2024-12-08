@@ -8,16 +8,11 @@ export const useComplimentSystem = () => {
   const [compliments, setCompliments] = useState<ComplimentType[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showPanel, setShowPanel] = useState(false);
-  const [favorites, setFavorites] = useState<ComplimentType[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   // Load saved favorites and fetch compliments on mount
   useEffect(() => {
-    const savedFavorites = localStorage.getItem("complimentFavorites");
-    if (savedFavorites) {
-      setFavorites(JSON.parse(savedFavorites));
-    }
-
     // Load last viewed compliments from localStorage
     const savedCompliments = localStorage.getItem("complimentHistory");
     if (savedCompliments) {
@@ -29,11 +24,6 @@ export const useComplimentSystem = () => {
     setLoading(false);
   }, []);
 
-  // Save favorites when they change
-  useEffect(() => {
-    localStorage.setItem("complimentFavorites", JSON.stringify(favorites));
-  }, [favorites]);
-
   // Save viewed compliments history
   useEffect(() => {
     localStorage.setItem("complimentHistory", JSON.stringify(compliments));
@@ -44,24 +34,27 @@ export const useComplimentSystem = () => {
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.code === "Space" && !e.repeat) {
         e.preventDefault();
-        generateNew();
+        if (!isGenerating) {
+          // Add this check
+          generateNew();
+        }
       } else if (e.code === "ArrowLeft") {
         navigatePrevious();
       } else if (e.code === "ArrowRight") {
         navigateNext();
       } else if (e.code === "KeyH") {
         setShowPanel((prev) => !prev);
-      } else if (e.code === "KeyF") {
-        toggleFavorite(compliments[currentIndex]);
       }
     };
 
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [currentIndex, compliments.length]);
+  }, [currentIndex, compliments.length, isGenerating]);
 
   const generateNew = async () => {
+    if (isGenerating) return;
     try {
+      setIsGenerating(true);
       // Fetch a random compliment from the database
       const response = await fetch("/api/compliments/random");
       if (!response.ok) throw new Error("Failed to fetch compliment");
@@ -83,38 +76,8 @@ export const useComplimentSystem = () => {
       setCurrentIndex(compliments.length);
     } catch (error) {
       console.error("Failed to generate new compliment:", error);
-    }
-  };
-
-  const toggleFavorite = async (compliment: ComplimentType) => {
-    try {
-      const isFav = isFavorite(compliment.id);
-
-      // Optimistically update the UI
-      setFavorites((prev) => {
-        if (isFav) {
-          return prev.filter((f) => f.id !== compliment.id);
-        }
-        return [...prev, compliment];
-      });
-
-      // Make the API call
-      const response = await fetch(`/api/compliments/${compliment.id}/vote`, {
-        method: "POST",
-      });
-
-      if (!response.ok) {
-        // Revert on error
-        setFavorites((prev) => {
-          if (isFav) {
-            return [...prev, compliment];
-          }
-          return prev.filter((f) => f.id !== compliment.id);
-        });
-        throw new Error("Failed to toggle favorite");
-      }
-    } catch (error) {
-      console.error("Failed to toggle favorite:", error);
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -130,20 +93,16 @@ export const useComplimentSystem = () => {
     }
   };
 
-  const isFavorite = (id: string) => favorites.some((f) => f.id === id);
-
   return {
     compliments,
     currentIndex,
     showPanel,
-    favorites,
     setShowPanel,
     generateNew,
-    toggleFavorite,
     navigateNext,
     navigatePrevious,
-    isFavorite,
     currentCompliment: compliments[currentIndex],
     loading,
+    isGenerating,
   };
 };

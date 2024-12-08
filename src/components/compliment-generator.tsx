@@ -7,13 +7,14 @@ import {
   Heart,
   History,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAnimation } from "../contexts/AnimationContext";
 import { useComplimentSystem } from "../hooks/useComplimentSystem";
 import { generateComplimentImage } from "../utils/generateImage";
 
 import { ActionButton } from "./action-button";
 import HistoryPanel from "./history-panel";
+import { useVoting } from "@/hooks/useVoting";
 
 const ComplimentGenerator = () => {
   const { isHeaderAnimationComplete } = useAnimation();
@@ -23,14 +24,39 @@ const ComplimentGenerator = () => {
     showPanel,
     setShowPanel,
     generateNew,
-    toggleFavorite,
     navigateNext,
     navigatePrevious,
-    isFavorite,
     currentCompliment,
+    isGenerating: isGeneratingCompliment,
   } = useComplimentSystem();
   const [showCopied, setShowCopied] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+
+  const {
+    isLoading: isVoting,
+    error: voteError,
+    hasVoted,
+    voteCount,
+    toggleVote,
+  } = useVoting(currentCompliment?.id);
+
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.code === "KeyF" && currentCompliment && !isVoting) {
+        toggleVote();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
+  }, [currentCompliment, isVoting, toggleVote]);
+
+  useEffect(() => {
+    if (voteError) {
+      // Show toast or error message
+      console.error(voteError);
+    }
+  }, [voteError]);
 
   const handleImageGeneration = async () => {
     if (!currentCompliment || isGenerating) return;
@@ -91,10 +117,11 @@ const ComplimentGenerator = () => {
     },
     {
       icon: Heart,
-      onClick: () => toggleFavorite(currentCompliment),
-      tooltip: "Toggle favorite (F)",
-      className: isFavorite(currentCompliment.id) ? "fill-current" : "",
-      count: currentCompliment.voteCount,
+      onClick: toggleVote,
+      tooltip: hasVoted ? "Remove vote (F)" : "Vote for this compliment (F)",
+      className: hasVoted ? "fill-current text-violet-500" : "",
+      count: voteCount,
+      isLoading: isVoting,
     },
     {
       icon: Copy,
@@ -165,10 +192,30 @@ const ComplimentGenerator = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={generateNew}
-              className="px-4 sm:px-6 py-2 rounded-full backdrop-blur-md 
-                       bg-white/10 dark:bg-white/5 font-medium border border-white/10"
+              disabled={isGeneratingCompliment}
+              className={`px-4 sm:px-6 py-2 rounded-full backdrop-blur-md 
+                       bg-white/10 dark:bg-white/5 font-medium border border-white/10
+                       disabled:opacity-50 disabled:cursor-not-allowed
+                       flex items-center gap-2`}
             >
-              Generate
+              {isGeneratingCompliment ? (
+                <>
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{
+                      repeat: Infinity,
+                      duration: 1,
+                      ease: "linear",
+                    }}
+                    className="w-4 h-4"
+                  >
+                    ◌
+                  </motion.div>
+                  Generating...
+                </>
+              ) : (
+                "Generate"
+              )}
             </motion.button>
           </div>
 
@@ -207,8 +254,6 @@ const ComplimentGenerator = () => {
         onClose={() => setShowPanel(false)}
         compliments={compliments}
         currentCompliment={currentCompliment}
-        onToggleFavorite={toggleFavorite}
-        isFavorite={isFavorite}
       />
     </>
   );
