@@ -12,8 +12,8 @@ import { useAnimation } from "../contexts/AnimationContext";
 import { useComplimentSystem } from "../hooks/useComplimentSystem";
 import { generateComplimentImage } from "../utils/generateImage";
 
-import HistoryPanel from "./history-panel";
 import { ActionButton } from "./action-button";
+import HistoryPanel from "./history-panel";
 
 const ComplimentGenerator = () => {
   const { isHeaderAnimationComplete } = useAnimation();

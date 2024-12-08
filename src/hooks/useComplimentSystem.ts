@@ -1,39 +1,43 @@
 // hooks/useComplimentSystem.ts
 import { useState, useEffect } from "react";
-import { ComplimentType, generateCompliment } from "../lib/content/compliments";
+import { ComplimentType } from "../lib/content/compliments";
 
-const MAX_HISTORY = 50; // Maximum number of compliments to store
+const MAX_HISTORY = 50;
 
 export const useComplimentSystem = () => {
   const [compliments, setCompliments] = useState<ComplimentType[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showPanel, setShowPanel] = useState(false);
   const [favorites, setFavorites] = useState<ComplimentType[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Load saved data on mount
+  // Load saved favorites and fetch compliments on mount
   useEffect(() => {
-    const savedCompliments = localStorage.getItem("complimentHistory");
     const savedFavorites = localStorage.getItem("complimentFavorites");
+    if (savedFavorites) {
+      setFavorites(JSON.parse(savedFavorites));
+    }
 
+    // Load last viewed compliments from localStorage
+    const savedCompliments = localStorage.getItem("complimentHistory");
     if (savedCompliments) {
       const parsed = JSON.parse(savedCompliments);
       setCompliments(parsed);
       setCurrentIndex(parsed.length - 1);
     }
 
-    if (savedFavorites) {
-      setFavorites(JSON.parse(savedFavorites));
-    }
+    setLoading(false);
   }, []);
 
-  // Save data when it changes
-  useEffect(() => {
-    localStorage.setItem("complimentHistory", JSON.stringify(compliments));
-  }, [compliments]);
-
+  // Save favorites when they change
   useEffect(() => {
     localStorage.setItem("complimentFavorites", JSON.stringify(favorites));
   }, [favorites]);
+
+  // Save viewed compliments history
+  useEffect(() => {
+    localStorage.setItem("complimentHistory", JSON.stringify(compliments));
+  }, [compliments]);
 
   // Keyboard controls
   useEffect(() => {
@@ -48,7 +52,6 @@ export const useComplimentSystem = () => {
       } else if (e.code === "KeyH") {
         setShowPanel((prev) => !prev);
       } else if (e.code === "KeyF") {
-        //    favorite the current compliment
         toggleFavorite(compliments[currentIndex]);
       }
     };
@@ -57,31 +60,62 @@ export const useComplimentSystem = () => {
     return () => window.removeEventListener("keydown", handleKeyPress);
   }, [currentIndex, compliments.length]);
 
-  const generateNew = () => {
-    const newCompliment = generateCompliment();
+  const generateNew = async () => {
+    try {
+      // Fetch a random compliment from the database
+      const response = await fetch("/api/compliments/random");
+      if (!response.ok) throw new Error("Failed to fetch compliment");
 
-    // Ensure no repeat within last 10 compliments
-    const recentCompliments = compliments.slice(-10);
-    while (recentCompliments.some((c) => c.text === newCompliment.text)) {
-      newCompliment.text = generateCompliment().text;
+      const newCompliment = await response.json();
+
+      // Ensure no repeat within last 10 compliments
+      const recentCompliments = compliments.slice(-10);
+      while (recentCompliments.some((c) => c.text === newCompliment.text)) {
+        const retryResponse = await fetch("/api/compliments/random");
+        const retryCompliment = await retryResponse.json();
+        newCompliment.text = retryCompliment.text;
+      }
+
+      setCompliments((prev) => {
+        const updated = [...prev, newCompliment];
+        return updated.slice(-MAX_HISTORY);
+      });
+      setCurrentIndex(compliments.length);
+    } catch (error) {
+      console.error("Failed to generate new compliment:", error);
     }
-
-    setCompliments((prev) => {
-      const updated = [...prev, newCompliment];
-      // Keep history within limit
-      return updated.slice(-MAX_HISTORY);
-    });
-    setCurrentIndex(compliments.length);
   };
 
-  const toggleFavorite = (compliment: ComplimentType) => {
-    setFavorites((prev) => {
-      const exists = prev.some((f) => f.id === compliment.id);
-      if (exists) {
-        return prev.filter((f) => f.id !== compliment.id);
+  const toggleFavorite = async (compliment: ComplimentType) => {
+    try {
+      const isFav = isFavorite(compliment.id);
+
+      // Optimistically update the UI
+      setFavorites((prev) => {
+        if (isFav) {
+          return prev.filter((f) => f.id !== compliment.id);
+        }
+        return [...prev, compliment];
+      });
+
+      // Make the API call
+      const response = await fetch(`/api/compliments/${compliment.id}/vote`, {
+        method: "POST",
+      });
+
+      if (!response.ok) {
+        // Revert on error
+        setFavorites((prev) => {
+          if (isFav) {
+            return [...prev, compliment];
+          }
+          return prev.filter((f) => f.id !== compliment.id);
+        });
+        throw new Error("Failed to toggle favorite");
       }
-      return [...prev, compliment];
-    });
+    } catch (error) {
+      console.error("Failed to toggle favorite:", error);
+    }
   };
 
   const navigateNext = () => {
@@ -110,5 +144,6 @@ export const useComplimentSystem = () => {
     navigatePrevious,
     isFavorite,
     currentCompliment: compliments[currentIndex],
+    loading,
   };
 };

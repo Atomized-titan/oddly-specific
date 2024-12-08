@@ -2,7 +2,7 @@
 import { sql } from "drizzle-orm";
 import { integer, sqliteTable, text, unique } from "drizzle-orm/sqlite-core";
 
-export const compliments = sqliteTable("oddly-specific_compliments", {
+export const compliments = sqliteTable("compliments", {
   id: text("id").primaryKey(),
   text: text("text").notNull(),
   category: text("category").notNull(),
@@ -12,7 +12,7 @@ export const compliments = sqliteTable("oddly-specific_compliments", {
 });
 
 export const votes = sqliteTable(
-  "oddly-specific_votes",
+  "votes",
   {
     id: text("id").primaryKey(),
     complimentId: text("compliment_id")
@@ -28,7 +28,7 @@ export const votes = sqliteTable(
   })
 );
 
-export const rateLimits = sqliteTable("oddly-specific_rate_limits", {
+export const rateLimits = sqliteTable("rate_limits", {
   id: text("id").primaryKey(),
   count: integer("count").notNull(),
   createdAt: integer("created_at", { mode: "timestamp" })

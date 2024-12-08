@@ -1,11 +1,11 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "6f53641e-962e-471f-8659-15889419b81c",
+  "id": "fa4af892-6214-4598-a654-0067bd2c760c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
-    "oddly-specific_compliments": {
-      "name": "oddly-specific_compliments",
+    "compliments": {
+      "name": "compliments",
       "columns": {
         "id": {
           "name": "id",
@@ -43,8 +43,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "oddly-specific_rate_limits": {
-      "name": "oddly-specific_rate_limits",
+    "rate_limits": {
+      "name": "rate_limits",
       "columns": {
         "id": {
           "name": "id",
@@ -83,8 +83,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "oddly-specific_votes": {
-      "name": "oddly-specific_votes",
+    "votes": {
+      "name": "votes",
       "columns": {
         "id": {
           "name": "id",
@@ -117,8 +117,8 @@
         }
       },
       "indexes": {
-        "oddly-specific_votes_compliment_id_session_id_unique": {
-          "name": "oddly-specific_votes_compliment_id_session_id_unique",
+        "votes_compliment_id_session_id_unique": {
+          "name": "votes_compliment_id_session_id_unique",
           "columns": [
             "compliment_id",
             "session_id"
@@ -127,10 +127,10 @@
         }
       },
       "foreignKeys": {
-        "oddly-specific_votes_compliment_id_oddly-specific_compliments_id_fk": {
-          "name": "oddly-specific_votes_compliment_id_oddly-specific_compliments_id_fk",
-          "tableFrom": "oddly-specific_votes",
-          "tableTo": "oddly-specific_compliments",
+        "votes_compliment_id_compliments_id_fk": {
+          "name": "votes_compliment_id_compliments_id_fk",
+          "tableFrom": "votes",
+          "tableTo": "compliments",
           "columnsFrom": [
             "compliment_id"
           ],
