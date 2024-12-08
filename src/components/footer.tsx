@@ -10,34 +10,27 @@ const Footer = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 1.2 }}
-      className="fixed bottom-6 left-1/2 -translate-x-1/2 
+      className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 
                 backdrop-blur-md bg-white/20 dark:bg-black/10 
                 border border-black/[0.06] dark:border-white/10
-                px-6 py-3 rounded-full
-                flex items-center gap-4"
+                px-3 sm:px-6 py-2 sm:py-3 rounded-full
+                flex items-center gap-2 sm:gap-4
+                max-w-[90vw] sm:max-w-none overflow-hidden"
     >
-      <Tooltip content="GitHub" position="top">
-        <a
-          href={GITHUB_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="p-2 rounded-full hover:bg-white/30 dark:hover:bg-white/10
-                   transition-colors duration-200"
-        >
-          <button type="button">
+      <div className="hidden sm:block">
+        <Tooltip content="GitHub" position="top">
+          <a href={GITHUB_URL}>
             <Github className="w-4 h-4" />
-          </button>
-        </a>
-      </Tooltip>
+          </a>
+        </Tooltip>
+      </div>
 
-      <div className="h-4 w-px bg-black/[0.06] dark:bg-white/10" />
+      <div className="hidden sm:block h-4 w-px bg-black/[0.06] dark:bg-white/10" />
 
-      <p className="text-sm text-gray-600/90 dark:text-white/40 text-center">
-        <span className="text-gray-300/90">Created by </span>
+      <p className="text-xs sm:text-sm text-gray-600/90 dark:text-white/40 text-center whitespace-nowrap">
+        Created by{" "}
         <a
           href={LINKEDIN_URL}
-          target="_blank"
-          rel="noopener noreferrer"
           className="text-white dark:text-white hover:text-purple-600 
                    dark:hover:text-purple-400 transition-colors duration-200
                    inline-flex items-center gap-1"
@@ -47,21 +40,15 @@ const Footer = () => {
         </a>
       </p>
 
-      <div className="h-4 w-px bg-black/[0.06] dark:bg-white/10" />
+      <div className="hidden sm:block h-4 w-px bg-black/[0.06] dark:bg-white/10" />
 
-      <Tooltip content="LinkedIn" position="top">
-        <a
-          href={LINKEDIN_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="p-2 rounded-full hover:bg-white/30 dark:hover:bg-white/10
-                   transition-colors duration-200"
-        >
-          <button type="button">
+      <div className="hidden sm:block">
+        <Tooltip content="LinkedIn" position="top">
+          <a href={LINKEDIN_URL}>
             <Linkedin className="w-4 h-4" />
-          </button>
-        </a>
-      </Tooltip>
+          </a>
+        </Tooltip>
+      </div>
     </motion.footer>
   );
 };

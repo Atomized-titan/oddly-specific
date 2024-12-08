@@ -24,7 +24,7 @@ const AnimatedHeader = () => {
   return (
     <motion.div
       layout
-      className={`fixed left-0 right-0 z-50 p-6 ${
+      className={`fixed left-0 right-0 z-50  p-4 sm:p-6 ${
         isCentered ? "top-1/2 -translate-y-1/2" : "top-0"
       }`}
       transition={{
@@ -37,19 +37,16 @@ const AnimatedHeader = () => {
         <div className="flex justify-between items-center">
           <motion.h1
             layout
-            className={`font-bold bg-clip-text from-white to-white text-transparent bg-gradient-to-r dark:from-purple-400 dark:to-pink-600 whitespace-nowrap ${
-              isCentered ? "text-7xl" : "text-2xl"
-            }`}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              type: "spring",
-              stiffness: 200,
-              damping: 20,
-              opacity: { duration: 0.2 },
-            }}
+            className={`font-bold bg-clip-text from-white to-white text-transparent 
+                      bg-gradient-to-r dark:from-purple-400 dark:to-pink-600 
+                      whitespace-normal sm:whitespace-nowrap ${
+                        isCentered
+                          ? "text-4xl sm:text-5xl md:text-7xl"
+                          : "text-lg sm:text-xl md:text-2xl"
+                      }`}
           >
-            Oddly Specific Compliments
+            <span className="block sm:inline">Oddly Specific</span>{" "}
+            <span className="block sm:inline">Compliments</span>
           </motion.h1>
 
           <motion.button
