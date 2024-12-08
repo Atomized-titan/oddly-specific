@@ -46,8 +46,9 @@ async function checkRateLimit(sessionId: string) {
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const id = (await params).id;
   try {
     // Get or create session ID
     const cookieStore = await cookies();
@@ -86,9 +87,7 @@ export async function POST(
     const existingVote = await db
       .select()
       .from(votes)
-      .where(
-        and(eq(votes.complimentId, params.id), eq(votes.sessionId, sessionId))
-      )
+      .where(and(eq(votes.complimentId, id), eq(votes.sessionId, sessionId)))
       .get();
 
     if (existingVote) {
@@ -100,7 +99,7 @@ export async function POST(
       .insert(votes)
       .values({
         id: uuid(),
-        complimentId: params.id,
+        complimentId: id,
         sessionId,
         createdAt: new Date(),
       })

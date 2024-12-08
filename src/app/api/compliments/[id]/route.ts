@@ -1,4 +1,3 @@
-// app/api/compliments/[id]/route.ts
 import { db } from "@/db";
 import { compliments, votes } from "@/db/schema";
 import { eq, sql } from "drizzle-orm";
@@ -6,8 +5,9 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const id = (await params).id;
   try {
     const result = await db
       .select({
@@ -19,7 +19,7 @@ export async function GET(
       })
       .from(compliments)
       .leftJoin(votes, eq(votes.complimentId, compliments.id))
-      .where(eq(compliments.id, params.id))
+      .where(eq(compliments.id, id))
       .groupBy(compliments.id)
       .get();
 
