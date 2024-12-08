@@ -51,13 +51,6 @@ const ComplimentGenerator = () => {
     return () => window.removeEventListener("keydown", handleKeyPress);
   }, [currentCompliment, isVoting, toggleVote]);
 
-  useEffect(() => {
-    if (voteError) {
-      // Show toast or error message
-      console.error(voteError);
-    }
-  }, [voteError]);
-
   const handleImageGeneration = async () => {
     if (!currentCompliment || isGenerating) return;
     try {
@@ -118,10 +111,15 @@ const ComplimentGenerator = () => {
     {
       icon: Heart,
       onClick: toggleVote,
-      tooltip: hasVoted ? "Remove vote (F)" : "Vote for this compliment (F)",
+      tooltip: voteError?.isRateLimit
+        ? `Rate limited - try again in ${voteError.retryAfter}s`
+        : hasVoted
+        ? "Remove vote (F)"
+        : "Vote for this compliment (F)",
       className: hasVoted ? "fill-current text-violet-500" : "",
       count: voteCount,
       isLoading: isVoting,
+      disabled: isVoting || (voteError?.isRateLimit ?? false),
     },
     {
       icon: Copy,
