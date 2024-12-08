@@ -94,6 +94,7 @@ const ComplimentGenerator = () => {
       onClick: () => toggleFavorite(currentCompliment),
       tooltip: "Toggle favorite (F)",
       className: isFavorite(currentCompliment.id) ? "fill-current" : "",
+      count: currentCompliment.voteCount,
     },
     {
       icon: Copy,
@@ -196,6 +197,9 @@ const ComplimentGenerator = () => {
             )}
           </AnimatePresence>
         </motion.div>
+        <pre className="hidden">
+          {JSON.stringify(currentCompliment, null, 2)}
+        </pre>
       </motion.div>
 
       <HistoryPanel

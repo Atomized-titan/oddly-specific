@@ -4,6 +4,7 @@ export type ComplimentType = {
   category: string;
   timestamp: Date;
   isFavorite?: boolean;
+  voteCount?: number;
 };
 
 export type ComplimentCategory = {
