@@ -121,7 +121,7 @@ export default async function Image() {
               fontWeight: 500,
             }}
           >
-            You're the kind of person who creates spotify playlists for
+            You&apos;re the kind of person who creates spotify playlists for
             extremely specific moods.
           </span>
         </div>
@@ -129,15 +129,6 @@ export default async function Image() {
     ),
     {
       ...size,
-      fonts: [
-        {
-          name: "Geist",
-          data: await fetch(
-            new URL("../public/fonts/GeistVF.woff", import.meta.url)
-          ).then((res) => res.arrayBuffer()),
-          style: "normal",
-        },
-      ],
     }
   );
 }
