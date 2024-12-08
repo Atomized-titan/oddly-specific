@@ -54,16 +54,19 @@ export async function GET(
     if (!sessionId) return NextResponse.json({ hasVoted: false });
 
     const id = (await params).id;
-
-    const vote = await db
-      .select()
-      .from(votes)
-      .where(and(eq(votes.complimentId, id), eq(votes.sessionId, sessionId)))
-      .get();
+    // Get both vote status and count in parallel
+    const [vote, voteCount] = await Promise.all([
+      db
+        .select()
+        .from(votes)
+        .where(and(eq(votes.complimentId, id), eq(votes.sessionId, sessionId)))
+        .get(),
+      getVoteCount(id),
+    ]);
 
     return NextResponse.json({
       hasVoted: !!vote,
-      voteCount: await getVoteCount(id),
+      voteCount,
     });
   } catch (error) {
     console.error("Failed to check vote status:", error);
